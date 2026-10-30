@@ -1,34 +1,24 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {criteria,candidates,evaluatePolicy,evaluateTransfer,policyText} from './lesson.mjs';
-const aligned={ownership:true,platform:true,improvement:true,brand:false,continuous:false,title:false};
-test('job-aligned rules preserve relevant evidence and ask about missing evidence',()=>{
-  const result=evaluatePolicy(aligned);assert.equal(result.aligned,true);
-  assert.deepEqual(result.profiles.map(p=>[p.id,p.status]),[['maya','review'],['eli','missing'],['sam','review']]);
-  assert.deepEqual(result.profiles[1].missing,['ownership','platform','improvement']);
-});
-test('each irrelevant requirement excludes otherwise relevant profiles',()=>{
-  for(const rule of ['brand','continuous','title']){
-    const result=evaluatePolicy({...aligned,[rule]:true});assert.equal(result.aligned,false);
-    for(const id of ['maya','sam']){const p=result.profiles.find(p=>p.id===id);assert.equal(p.status,'held');assert.deepEqual(p.excludedBy,[rule]);}
+import {cases,evaluateChoice,reviewPlan} from './lesson.mjs';
+test('every displayed decision has a consequence, with a supported recommendation',()=>{
+  for(const c of cases){
+    assert.equal(c.options.filter(o=>o.recommended).length,1);
+    for(const o of c.options)assert.ok(evaluateChoice(c.id,o.id).feedback.length>100);
   }
 });
-test('no requirements is not an aligned policy',()=>{assert.equal(evaluatePolicy(Object.fromEntries(criteria.map(c=>[c.id,false]))).aligned,false);});
-test('all 64 policies respect the authored evidence and only one matches the brief',()=>{
-  let pass=0;
-  for(let mask=0;mask<64;mask++){
-    const policy=Object.fromEntries(criteria.map((c,i)=>[c.id,Boolean(mask&(1<<i))]));
-    const result=evaluatePolicy(policy);if(result.aligned)pass++;
-    for(const profile of result.profiles){
-      const data=candidates.find(c=>c.id===profile.id),required=criteria.filter(c=>policy[c.id]);
-      const expected=required.some(c=>data.facts[c.id]===false)?'held':required.some(c=>data.facts[c.id]===null)?'missing':'review';
-      assert.equal(profile.status,expected);
-    }
-  }
-  assert.equal(pass,1);
+test('invalid inputs cannot masquerade as reviewed choices',()=>{
+  for(const args of [['criteria',null],['missing','shadow'],['pilot','made-up']])assert.throws(()=>evaluateChoice(...args));
 });
-test('free text, incomplete, and unexpected policy fields cannot be graded as a policy',()=>{for(const input of [null,'impact transferable',{}, {...aligned,improvement:undefined},{...aligned,arbitrary:true}])assert.throws(()=>evaluatePolicy(input));});
-test('transfer check distinguishes missing evidence from brand matching and exclusion',()=>{assert.equal(evaluateTransfer('ask').passed,true);for(const choice of ['advance','exclude',null,'impact transferable'])assert.equal(evaluateTransfer(choice).passed,false);});
-test('generated policy reflects the selected rules rather than a match score',()=>{
-  assert.match(policyText(aligned),/Follow up when that evidence is missing/);assert.match(policyText(aligned),/Do not exclude/);assert.doesNotMatch(policyText(aligned),/Require experience with Workday Learning specifically/);assert.match(policyText({...aligned,brand:true}),/Require experience with Workday Learning specifically/);
+test('unfinished and risky reviews are not exported as approved plans',()=>{
+  assert.equal((reviewPlan({}).match(/Not reviewed yet/g)||[]).length,4);
+  const text=reviewPlan({criteria:'domain',evidence:'accept',access:'recording',pilot:'volume'});
+  assert.equal((text.match(/Revisit before a pilot/g)||[]).length,4);
+  assert.match(text,/Your decision: Keep ATS/);
+});
+test('recommended review preserves uncertainty, access, and human contact approval',()=>{
+  const text=reviewPlan({criteria:'ownership',evidence:'split',access:'confirm',pilot:'shadow'});
+  assert.match(text,/Ratings can guide improvements/);
+  assert.match(text,/without treating a requested adjustment as evidence of ability/);
+  assert.match(text,/People decide and approve candidate contact/);
 });
