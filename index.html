@@ -1,233 +1,71 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Human-First ATS Calibration Sandbox</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Practice choosing screening criteria, checking candidate evidence, and revising a policy. A fictional learning exercise by Clea Mahoney.">
+  <title>ATS sandbox | Clea Mahoney</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.mjs"></script>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen p-6 font-sans">
-  <div class="max-w-6xl mx-auto space-y-6">
-    
-    <!-- Header -->
-    <header class="border-b border-slate-800 pb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-      <div>
-        <span class="text-xs font-mono uppercase tracking-wider bg-indigo-500/20 text-indigo-300 px-2.5 py-1 rounded border border-indigo-500/30">Interactive Enablement Prototype</span>
-        <h1 class="text-2xl font-bold mt-2">Human-First ATS Calibration Sandbox</h1>
-        <p class="text-slate-400 text-sm">Training Recruiting Ops to evaluate transferable human capability over brittle keywords.</p>
-      </div>
-      <div class="bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 text-xs text-slate-400 max-w-xs">
-        <strong class="text-slate-200 block">Portfolio Architecture Demo</strong>
-        Separates deterministic JS guardrails (Layer 1) from structured LLM rubric evaluation (Layer 2) and Socratic coaching (Layer 3).
-      </div>
-    </header>
-
-    <!-- Main Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      
-      <!-- Left Column: Candidate & Sandbox (7 cols) -->
-      <div class="lg:col-span-7 space-y-6">
-        
-        <!-- Candidate Card -->
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3">
-          <div class="flex justify-between items-start">
-            <div>
-              <h2 class="font-semibold text-lg text-white">Target CandidateFixture: Maya Lin</h2>
-              <p class="text-xs text-slate-400">Applying for: Senior Enablement Manager</p>
-            </div>
-            <span id="candidate-badge" class="text-xs font-mono px-2.5 py-1 rounded bg-red-500/20 text-red-300 border border-red-500/30">
-              STATUS: AUTO-REJECTED
-            </span>
-          </div>
-          <p class="text-sm text-slate-300 leading-relaxed">
-            6 years building technical onboarding and customer education from 0 to 1. Reduced customer time-to-value by 42% and cut Tier-1 support tickets by 30%.
-          </p>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs">
-            <div class="bg-slate-950/80 p-3 rounded border border-slate-800/80">
-              <strong class="text-amber-400 block mb-1">Legacy ATS Trap #1: Layoff Gap</strong>
-              7-month employment gap in 2026 due to a company-wide layoff.
-            </div>
-            <div class="bg-slate-950/80 p-3 rounded border border-slate-800/80">
-              <strong class="text-amber-400 block mb-1">Legacy ATS Trap #2: Tooling Keywords</strong>
-              Built LMS workflows using Notion, Loom & APIs (No exact "Workday LMS" keyword).
-            </div>
-          </div>
-        </div>
-
-        <!-- Learner Input Box -->
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <label class="font-semibold text-sm text-slate-200">Admin Task: Configure AI Screening Prompt</label>
-            <div class="flex gap-1.5">
-              <button onclick="setPreset(1)" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded transition">Preset 1: Legacy Filter</button>
-              <button onclick="setPreset(2)" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded transition">Preset 2: Title-Obsessed</button>
-              <button onclick="setPreset(3)" class="text-xs bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 border border-indigo-500/40 px-2.5 py-1 rounded transition">Preset 3: Human-First</button>
-            </div>
-          </div>
-
-          <textarea id="prompt-input" rows="4" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">Screen for a Senior Enablement Manager. Candidates must have Workday LMS experience and no career gaps in the last 3 years.</textarea>
-
-          <button onclick="runEvaluation()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 px-4 rounded-lg text-sm transition">
-            Test Screening Instructions Against Maya's Profile
-          </button>
-        </div>
-
-        <!-- Socratic Coach Output -->
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-mono uppercase tracking-wider text-indigo-400">Layer 3: Socratic Enablement Coach</span>
-            <span id="coach-status" class="text-xs text-slate-500">Waiting for submission...</span>
-          </div>
-          <p id="coach-output" class="text-sm text-slate-300 leading-relaxed pt-1">
-            Click "Test Screening Instructions" above to see how the hybrid evaluator grades your configuration and coaches you toward a human-first screening policy.
-          </p>
-        </div>
-
-      </div>
-
-      <!-- Right Column: Live Telemetry (5 cols) -->
-      <div class="lg:col-span-5 space-y-6">
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
-          <div>
-            <h2 class="font-semibold text-base text-white">Live Grader Telemetry</h2>
-            <p class="text-xs text-slate-400">Proof of separation between deterministic code and LLM evaluation.</p>
-          </div>
-
-          <!-- Layer Indicators -->
-          <div class="space-y-2.5 text-xs font-mono">
-            <div class="flex justify-between items-center bg-slate-950 p-3 rounded border border-slate-800">
-              <span>Layer 1: Deterministic JS Regex</span>
-              <span id="layer1-badge" class="px-2 py-0.5 rounded bg-slate-800 text-slate-400">STANDBY</span>
-            </div>
-            <div class="flex justify-between items-center bg-slate-950 p-3 rounded border border-slate-800">
-              <span>Layer 2: LLM Rubric Judge</span>
-              <span id="layer2-badge" class="px-2 py-0.5 rounded bg-slate-800 text-slate-400">STANDBY</span>
-            </div>
-          </div>
-
-          <!-- Raw JSON Output -->
-          <div>
-            <span class="text-xs font-mono text-slate-400 block mb-1.5">Structured Telemetry Payload:</span>
-            <pre id="telemetry-json" class="bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs font-mono text-emerald-400 overflow-x-auto leading-relaxed">{
-  "status": "ready",
-  "instructions": "Select a preset or type a custom screening prompt to inspect grader execution."
-}</pre>
-          </div>
-        </div>
-      </div>
-
+<body>
+  <a class="skip" href="#main">Skip to the exercise</a>
+  <header class="masthead"><a href="./" class="wordmark">ATS sandbox</a><a href="https://clea-mahoney.github.io/clea-portfolio/">Clea Mahoney’s portfolio ↗</a></header>
+  <main id="main">
+    <div class="intro">
+      <p class="eyebrow">Fictional practice · About 3 minutes</p>
+      <h1>Would your screening rules miss the evidence?</h1>
+      <p>Choose the rules for a fictional role. See who they leave out, revise them, then try a new profile.</p>
     </div>
-  </div>
-
-  <script>
-    const presets = {
-      1: "Screen for a Senior Enablement Manager. Candidates must have Workday LMS experience and no career gaps in the last 3 years.",
-      2: "Only advance candidates who have held the exact job title of Senior Enablement Manager for 5+ years.",
-      3: "Evaluate candidates based on measurable onboarding impact and transferable systems-building skills, regardless of specific LMS brand names or layoff-related career gaps."
-    };
-
-    function setPreset(num) {
-      document.getElementById('prompt-input').value = presets[num];
-      runEvaluation();
-    }
-
-    // LAYER 1: 100% DETERMINISTIC JAVASCRIPT REGEX (0 AI Tokens)
-    function deterministicGuardrail(text) {
-      const lower = text.toLowerCase();
-      if (/\b(must have workday|require workday|workday lms experience|exact keyword)\b/.test(lower)) {
-        return {
-          passed_layer_1: false,
-          failed_at: "Layer 1 (Deterministic JS Regex)",
-          llm_judge_status: "SKIPPED (0 AI Tokens Spent)",
-          error_code: "RIGID_BRAND_KEYWORD_FILTER",
-          detail: "Detected hard requirement for a specific software brand ('Workday') instead of transferable LMS capability."
-        };
-      }
-      if (/\b(no gaps|no career gaps|continuous employment|penalize gaps)\b/.test(lower)) {
-        return {
-          passed_layer_1: false,
-          failed_at: "Layer 1 (Deterministic JS Regex)",
-          llm_judge_status: "SKIPPED (0 AI Tokens Spent)",
-          error_code: "LAYOFF_GAP_PENALTY",
-          detail: "Detected hard penalty against employment gaps, automatically filtering out laid-off talent."
-        };
-      }
-      return { passed_layer_1: true };
-    }
-
-    // LAYER 2: SIMULATED STRUCTURED RUBRIC JUDGE (Evaluates semantic nuance)
-    function structuredRubricJudge(text) {
-      const lower = text.toLowerCase();
-      const evaluatesImpact = /(impact|outcome|measurable|result|reduced|built|0 to 1|metric)/.test(lower);
-      const allowsTransferable = /(transferable|equivalent|regardless of|adaptable|systems|capability)/.test(lower);
-      const demandsExactTitle = /(exact job title|exact title|only advance candidates who have held)/.test(lower);
-
-      const passed = evaluatesImpact && allowsTransferable && !demandsExactTitle;
-      return {
-        passed_layer_1: true,
-        passed_layer_2: passed,
-        failed_at: passed ? null : "Layer 2 (Structured Rubric Judge)",
-        llm_judge_status: "EXECUTED (temperature: 0.0)",
-        rubric_scores: {
-          prioritizes_measurable_impact: evaluatesImpact,
-          values_transferable_skills: allowsTransferable,
-          avoids_rigid_title_gating: !demandsExactTitle
-        }
-      };
-    }
-
-    function runEvaluation() {
-      const input = document.getElementById('prompt-input').value.trim();
-      const l1Badge = document.getElementById('layer1-badge');
-      const l2Badge = document.getElementById('layer2-badge');
-      const candBadge = document.getElementById('candidate-badge');
-      const coachOutput = document.getElementById('coach-output');
-      const coachStatus = document.getElementById('coach-status');
-      const jsonBox = document.getElementById('telemetry-json');
-
-      const l1Result = deterministicGuardrail(input);
-
-      if (!l1Result.passed_layer_1) {
-        l1Badge.className = "px-2 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30";
-        l1Badge.textContent = "BLOCKED (0ms)";
-        l2Badge.className = "px-2 py-0.5 rounded bg-slate-800 text-slate-400";
-        l2Badge.textContent = "SKIPPED (0 Tokens)";
-        candBadge.className = "text-xs font-mono px-2.5 py-1 rounded bg-red-500/20 text-red-300 border border-red-500/30";
-        candBadge.textContent = "STATUS: AUTO-REJECTED";
-        coachStatus.textContent = "Coaching triggered via Layer 1";
-        jsonBox.textContent = JSON.stringify(l1Result, null, 2);
-
-        if (l1Result.error_code === "RIGID_BRAND_KEYWORD_FILTER") {
-          coachOutput.textContent = "Your prompt was caught by Layer 1 because it requires exact brand experience ('Workday LMS') and blocks career gaps. Maya reduced onboarding time by 42% using Notion and APIs, and her 2026 gap was a company-wide layoff. How can you rewrite this rule to evaluate her systems-building outcomes rather than specific software brand names or uninterrupted employment?";
-        } else {
-          coachOutput.textContent = "Layer 1 flagged a career gap penalty in your instructions. Penalizing employment gaps automatically discards top performers like Maya who experienced a company-wide layoff. What criteria could you substitute here to measure what she accomplished when she was in seat?";
-        }
-        return;
-      }
-
-      // Passed Layer 1 -> Run Layer 2
-      l1Badge.className = "px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
-      l1Badge.textContent = "PASSED";
-
-      const l2Result = structuredRubricJudge(input);
-      jsonBox.textContent = JSON.stringify(l2Result, null, 2);
-
-      if (l2Result.passed_layer_2) {
-        l2Badge.className = "px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
-        l2Badge.textContent = "PASSED";
-        candBadge.className = "text-xs font-mono px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
-        candBadge.textContent = "STATUS: FAST-TRACKED (94% MATCH)";
-        coachStatus.textContent = "Calibration Complete";
-        coachOutput.textContent = "Calibration passed. You removed legacy keyword and layoff-gap traps, and explicitly instructed the screener to weigh measurable impact and transferable systems architecture. Maya Lin is now surfaced as a top-tier match.";
-      } else {
-        l2Badge.className = "px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30";
-        l2Badge.textContent = "FAILED RUBRIC";
-        candBadge.className = "text-xs font-mono px-2.5 py-1 rounded bg-red-500/20 text-red-300 border border-red-500/30";
-        candBadge.textContent = "STATUS: REJECTED BY RUBRIC";
-        coachStatus.textContent = "Coaching triggered via Layer 2";
-        coachOutput.textContent = "Your prompt avoided hard banned phrases in Layer 1, but failed the Layer 2 semantic rubric. Right now, it gates candidates on exact past job titles or misses explicit instructions to weigh measurable outcomes and transferable skills. How can you instruct the AI to look for 0-to-1 impact instead of title matching?";
-      }
-    }
-  </script>
+    <nav aria-label="Exercise progress"><ol class="steps" id="steps"><li aria-current="step">1. Choose rules</li><li>2. Check and revise</li><li>3. Try a new profile</li><li>4. Take it with you</li></ol></nav>
+    <section id="policy-screen" aria-labelledby="policy-heading">
+      <div class="workspace">
+        <aside class="brief" aria-labelledby="brief-heading">
+          <p class="eyebrow">The job brief</p><h2 id="brief-heading">Senior enablement manager</h2>
+          <p>This team needs someone to build self-serve customer onboarding, run the learning platform, and use evidence to improve the program.</p>
+          <p>The platform is Workday Learning. The team can train an experienced learning-platform owner on its tools.</p>
+          <details><summary>What counts as evidence here?</summary><p>Look for work the person owned: a program they built, systems they maintained, and how they checked whether the program helped. A result alone does not tell you how they achieved it.</p></details>
+          <p class="small">All names, employers, and results in this exercise are fictional. These are practice rules for this job brief.</p>
+        </aside>
+        <div class="panel">
+          <p class="eyebrow" id="policy-label">Your first attempt</p><h2 id="policy-heading" tabindex="-1">What should the policy require?</h2>
+          <p>Choose “Require” or “Leave out” for each rule. You’ll inspect three profiles after your first attempt.</p>
+          <form id="policy-form"><div id="criteria"></div><p class="form-error" id="form-error" role="alert"></p><button type="submit" id="test-policy">Test my rules</button></form>
+        </div>
+      </div>
+    </section>
+    <section id="review-screen" aria-labelledby="review-heading" hidden>
+      <div class="section-top"><div><p class="eyebrow" id="attempt-label"></p><h2 id="review-heading" tabindex="-1">What your rules did</h2></div><span class="tag">Scripted practice results</span></div>
+      <div id="review-summary" class="callout" role="status"></div>
+      <div class="candidate-grid" id="candidates"></div>
+      <div class="panel feedback"><h3>Check the policy against the job</h3><div id="rule-feedback"></div>
+        <details><summary>Read the policy you built</summary><p id="policy-text"></p></details>
+        <label for="reflection">What would you change, and why? <span class="small">Optional. Your note is not graded.</span></label><textarea id="reflection" rows="3" maxlength="2000" placeholder="Which evidence did your rules miss?"></textarea>
+        <div class="actions"><button id="revise" type="button">Revise my rules</button><button id="transfer" type="button" class="secondary" hidden>Try a new profile →</button></div>
+      </div>
+    </section>
+    <section id="transfer-screen" aria-labelledby="transfer-heading" hidden>
+      <p class="eyebrow">Same job. Same criteria. New evidence.</p><h2 id="transfer-heading" tabindex="-1">What would you do next?</h2>
+      <p>Your revised policy stays in place. Read Noor’s profile before choosing a next step.</p>
+      <div class="transfer-layout"><article class="panel"><p class="eyebrow">Fictional profile</p><h3>Noor Patel</h3><p class="small">Customer learning lead · Four years in customer education</p>
+        <dl class="evidence"><div><dt>Program ownership</dt><dd>Designed a self-serve onboarding path with task-based practice and support-team input.</dd></div><div><dt>Platform work</dt><dd>Owned publishing, enrollment rules, and troubleshooting in Workday Learning.</dd></div><div><dt>Evidence of improvement</dt><dd>Collected course ratings. The profile does not explain how Noor checked whether customers could complete the product tasks or used the findings to change the program.</dd></div><div><dt>Work history</dt><dd>Returned after an eight-month break. Has not held the exact title “Senior enablement manager.”</dd></div></dl>
+      </article><form class="panel" id="transfer-form"><fieldset><legend>Which next step follows the job brief?</legend>
+        <label class="answer"><input type="radio" name="next-step" value="advance"> Treat the tool match and course ratings as enough evidence.</label>
+        <label class="answer"><input type="radio" name="next-step" value="ask"> Ask how Noor checked customer performance and used the findings to improve onboarding.</label>
+        <label class="answer"><input type="radio" name="next-step" value="exclude"> Set the profile aside because of the break and different title.</label>
+      </fieldset><p id="transfer-feedback" role="status"></p><button type="submit">Check my reasoning</button><button type="button" class="secondary" id="back-review">Review my policy</button></form></div>
+    </section>
+    <section id="finish-screen" aria-labelledby="finish-heading" hidden>
+      <p class="eyebrow">Exercise complete</p><h2 id="finish-heading" tabindex="-1">Keep the criteria. Check the evidence.</h2>
+      <p>You applied the same criteria to a new profile and identified what still needed a follow-up question.</p>
+      <div id="learning-summary" class="callout"></div><div class="panel"><h3>Your revised practice policy</h3><p id="final-policy"></p><p id="saved-reflection" hidden></p><div class="actions"><button id="copy-policy" type="button">Copy policy</button><button id="restart" type="button" class="secondary">Start again</button></div><p id="copy-status" role="status"></p></div>
+      <p class="takeaway">A rule can exclude relevant evidence. Removing that rule does not establish someone’s qualifications. Check what they did, how they did it, and what you still need to ask.</p>
+    </section>
+    <noscript><p class="callout">This exercise needs JavaScript. It runs in your browser without an account.</p></noscript>
+  </main>
+  <footer><p>A learning-design prototype by <a href="https://clea-mahoney.github.io/clea-portfolio/">Clea Mahoney</a>.</p><details><summary>How this exercise works</summary><p>Rule choices are checked against an authored answer key for this fictional job brief. Candidate evidence and feedback are scripted. No AI model evaluates your input, no match percentage is calculated, and your notes stay in this tab. This is a learning exercise, not a working applicant tracking system or a claim about a particular product.</p><p><a href="https://github.com/clea-mahoney/ats-sandbox">Read the source and learning-design notes ↗</a></p></details></footer>
 </body>
 </html>
