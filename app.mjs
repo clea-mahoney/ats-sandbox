@@ -1,4 +1,4 @@
-import {cases,evaluateChoice,reviewPlan} from './lesson.mjs';
+import {cases,evaluateChoice,reviewPlan} from './lesson.mjs?v=20261030-2';
 const $=id=>document.getElementById(id);
 let index=0;
 const decisions={},selections={},notes={};
